@@ -8,6 +8,7 @@ const LgaMap = ({ lgaName }) => {
 
     useEffect(() => {
         d3.json("/lgas.geojson").then(data => {
+            console.log("Loaded GeoJSON data:", data);
             const specificLGAData = data.features.filter(
                 feature => feature.properties.lga_name === lgaName
             );
@@ -29,17 +30,14 @@ const LgaMap = ({ lgaName }) => {
 
             // Calculate the centroid of the LGA
             const centroid = d3.geoCentroid(lgaData);
+            console.log("LGA Centroid:", centroid);
 
             const projection = d3.geoMercator()
-                .scale(8000) 
+                .scale(3500) 
                 .center(centroid) 
                 .translate([800 / 2, 800 / 2]);
 
             const path = d3.geoPath().projection(projection);
-
-            const colorScale = d3.scaleThreshold()
-                .domain([1, 10, 20, 30])
-                .range(["#878787", "#658565", "#4E844E", "#288228", "#008000"]);
 
             // Clear previous drawings
             svg.selectAll("*").remove();
@@ -51,20 +49,17 @@ const LgaMap = ({ lgaName }) => {
                 .enter()
                 .append("path")
                 .attr("d", path)
-                .attr("fill", d => {
-                    // Replace 'someProperty' with the actual property name from your data
-                    const value = d.properties.serviceProvider; 
-                    return colorScale(value);
-                })
-                .attr("stroke", "#FFFFFF")
+                .attr("fill", "#4E844E") // Basic color for visualization
                 .on("mouseover", function(event, d) {
                     d3.select(this).attr("fill", "#B11B10");
                     setCurrentHeading(d.properties.lga_name);
                 })
                 .on("mouseout", function(event, d) {
-                    d3.select(this).attr("fill", colorScale(d.properties.serviceProvider));
+                    d3.select(this).attr("fill", "#4E844E");
+                    setCurrentHeading("Select a LGA");
                 });
-        }
+        };
+        
     }, [lgaData]);
 
     return (
