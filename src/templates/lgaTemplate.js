@@ -19,7 +19,7 @@ const lgaTemplate = ({ data }) => {
     <div>
       <h1>{lgaData.lga_name}</h1>
       <h2>{lgaData.state}</h2>
-      <LgaMap lgaData={lgaData}/> 
+      <LgaMap lgaName={lgaData.lga_name} stateName={lgaData.state} />
     </div>
   );
 };

@@ -1,27 +1,39 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef} from 'react';
 import * as d3 from 'd3';
+import Select from 'react-select';
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 
+const states = [
+  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", 
+  "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", 
+  "Federal Capital Territory", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", 
+  "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", 
+  "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
+];
 
 const NationalMap = () => {
-  const svgRef = useRef(null);
+    const svgRef = useRef(null);
+    const [currentHeading, setCurrentHeading] = useState("NIGERIA");
+    const [selectedService, setSelectedService] = useState("serviceProviders");
+    const [selectedPopulation, setSelectedPopulation] = useState("allPopulations");
+    const [selectedLocation, setSelectedLocation] = useState("AllLocations");
 
-  const [currentHeading, setCurrentHeading] = React.useState("NIGERIA");
+    useEffect(() => {
+        const svg = d3.select(svgRef.current);
 
-  useEffect(() => {
-    const svg = d3.select(svgRef.current);
+        const projection = d3.geoMercator()
+          .scale(3500)
+          .center([8.6753, 9.0820])
+          .translate([800 / 2, 800 / 2]);
 
-    const projection = d3.geoMercator()
-      .scale(3500)
-      .center([8.6753, 9.0820])
-      .translate([800 / 2, 800 / 2]);
+        const path = d3.geoPath().projection(projection);
 
-    const path = d3.geoPath().projection(projection);
+        const colorScale = d3.scaleThreshold()
+          .domain([1, 10, 20, 30])
+          .range(["#878787", "#658565", "#4E844E", "#288228", "#008000"]);
 
-    const colorScale = d3.scaleThreshold()
-      .domain([1, 10, 20, 30])
-      .range(["#878787", "#658565", "#4E844E", "#288228", "#008000"]);
-
-      function updateVisualization(currentFilter) {
+        function updateVisualization(currentFilter) {
         Promise.all([
             d3.json("/nigeria_geojson.geojson"),
             d3.csv("/service_providers.csv")
@@ -71,17 +83,24 @@ const NationalMap = () => {
     }
 
     
-    updateVisualization("state");
+    updateVisualization(selectedService); // or use multiple parameters if needed
 
-  }, []);  
+  }, [selectedService, selectedPopulation, selectedLocation]);
 
   return (
     <div className="national-map">
-      <svg ref={svgRef} width={800} height={800}></svg>
-      <h2 className="custom-underline">{currentHeading}</h2>
- {/* You'll replace this with dynamic text if you implement the state suggestion above */}
+        <svg ref={svgRef} width={800} height={800}></svg>
+        <h2 className="custom-underline">{currentHeading}</h2>
+
+        {/* Bootstrap Dropdown Example */}
+        <DropdownButton id="dropdown-basic-button" title="Select State">
+   {states.map(state => (
+       <Dropdown.Item key={state} href={`/state/${state.toLowerCase().replace(/\s+/g, '-')}`}>{state}</Dropdown.Item>
+   ))}
+</DropdownButton>
+
     </div>
-  );
-};
+);
+}
 
 export default NationalMap;
