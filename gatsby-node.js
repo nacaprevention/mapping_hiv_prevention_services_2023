@@ -40,7 +40,7 @@ exports.createPages = async ({ graphql, actions }) => {
 
         // Create LGA pages
         createPage({
-            path: `/state/${node.state.toLowerCase()}/${node.lga_name.toLowerCase()}`,
+          path: `/state/${node.state.toLowerCase().replace(/\s+/g, '-')}/${node.lga_name.toLowerCase().replace(/\s+/g, '-')}`,
             component: lgaTemplate,
             context: {
                 state: node.state,

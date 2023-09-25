@@ -1,0 +1,97 @@
+.row{
+    margin-left: 5vh;
+}
+
+.scrollable-dropdown .dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: 'Lato', sans-serif;
+}
+
+#dropdown-basic-button{
+    background-color: #008000;
+    border: none;
+    font-family: 'Lato', sans-serif;
+}
+
+#dropdown-basic-button_filter_service, #dropdown-basic-button_filter_population, #dropdown-basic-button_filter_location, 
+#dropdown-basic-button_filter_state, #dropdown-basic-button_filter_lga {
+    background-color: transparent;
+    color: #008000;
+    border-radius: 0%;
+    border-top: 0px;
+    border-right: 0px;
+    border-left: 0px;
+    border-bottom: solid 2px;
+    border-color: #bfbfbf;
+    padding-left: 0px;
+    font-family: 'Lato', sans-serif;
+}
+
+.welcome-text {
+    color: blue; /* Or any other styles you want */
+    font-weight: bold;
+    margin-left: 2vh;
+    font-family: 'Lato', sans-serif;
+    color: #008000;
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+
+.current-heading {
+    font-family: 'Lato', sans-serif;
+    color: #008000;
+    font-size: 1.7rem;
+    font-weight: 700;
+    padding-top: 1vh;
+    border-bottom: 4px solid #B11B10;  /* Blue underline */                   /* Red text color */
+    display: inline-block;          /* Necessary if you want the underline to only span the text width */
+    padding-bottom: 2px;  
+}
+
+.logo {
+    width: 100px; /* Adjust based on your logo size */
+    height: 100px; /* Adjust based on your logo size */
+}
+
+.header-container {
+    margin-top: 4vh;
+    margin-left: 4vh;
+}
+
+.separator{
+margin-left: 1vh;
+margin-right: 1vh;
+color: #54595f;
+font-size: 1.4rem;
+font-weight: 700;
+}
+
+.national-map svg {
+    margin-top: -10vh;  /* Adjust value as needed */
+}
+
+.row {
+    margin-top: 4vh;
+}
+
+h3{
+    font-family: 'Lato', sans-serif;
+    color: #54595f;
+    font-size: 1rem;
+    font-weight: 700;
+    padding-top: 5vh;
+    text-transform: uppercase;
+}
+
+h2{
+    font-family: 'Lato', sans-serif;
+    color: #008000;
+    font-size: 1.7rem;
+    font-weight: 700;
+    padding-top: 4.5vh;
+}
+
+.map_position{
+    padding-top: -50px;
+}

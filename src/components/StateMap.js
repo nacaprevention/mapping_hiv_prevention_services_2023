@@ -1,26 +1,29 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-
 function getStateGeoJSONPath(stateName) {
-    // Convert spaces to underscores
+    if (!stateName) {
+        console.warn("getStateGeoJSONPath was called with an undefined or null stateName.");
+        return '';
+    }
     return `/${stateName.replace(/\s+/g, '_').toLowerCase()}.geojson`;
 }
+
 
 const StateMap = ({ stateName }) => {
     const svgRef = useRef(null);
     const [currentHeading, setCurrentHeading] = React.useState("Select a LGA");
+    const offsetY = 150; 
 
     useEffect(() => {
         const svg = d3.select(svgRef.current);
 
+        const width = 800;
+        const height = 800;
         const projection = d3.geoMercator()
-            .scale(3500)
-            .center([8.6753, 9.0820])
-            .translate([800 / 2, 800 / 2]);
+        .translate([width / 2, (height / 2) - offsetY]);
 
         const path = d3.geoPath().projection(projection);
-
         const colorScale = d3.scaleThreshold()
             .domain([1, 10, 20, 30])
             .range(["#878787", "#658565", "#4E844E", "#288228", "#008000"]);
@@ -30,17 +33,22 @@ const StateMap = ({ stateName }) => {
         const fetchData = async () => {
             try {
                 const geoData = await d3.json(stateGeoJSONPath);
-                const serviceData = await d3.csv("/service_providers.csv");
+                const bounds = path.bounds(geoData);
+                const centroid = d3.geoCentroid(geoData);
+                const dx = bounds[1][0] - bounds[0][0];
+                const dy = bounds[1][1] - bounds[0][1];
+                const scale = 0.1 / Math.max(dx / width, dy / height) * width;
+                projection.scale(scale).center(centroid);
 
+                const serviceData = await d3.csv("/service_providers.csv");
                 geoData.features.forEach(geoFeature => {
                     const serviceFeature = serviceData.find(s => s.lga_name === geoFeature.properties.lga_name);
                     if (serviceFeature) {
-                        geoFeature.properties.currentValue = +serviceFeature.lga_name;  // I assume this should be lga_name, please adjust if needed.
+                        geoFeature.properties.currentValue = +serviceFeature.lga_name;
                     }
                 });
 
                 svg.selectAll("path").remove();
-
                 svg.append("g")
                     .selectAll("path")
                     .data(geoData.features)
@@ -78,7 +86,9 @@ const StateMap = ({ stateName }) => {
 
     return (
         <div className="state-map">
+            <div className='map_position'>
             <svg ref={svgRef} width={800} height={800}></svg>
+            </div>
             <h2 className="custom-underline">{currentHeading}</h2>
         </div>
     );
