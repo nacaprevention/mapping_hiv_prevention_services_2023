@@ -29,7 +29,7 @@ exports.createPages = async ({ graphql, actions }) => {
         // Create state pages only once per unique state
         if (!createdStates.has(node.state)) {
             createPage({
-                path: `/state/${node.state.toLowerCase()}`,
+                path: `/state/${node.state.toLowerCase().replace(/\s+/g, '-')}`, // Added hyphen replacement for state
                 component: stateTemplate,
                 context: {
                     state: node.state,
@@ -40,7 +40,7 @@ exports.createPages = async ({ graphql, actions }) => {
 
         // Create LGA pages
         createPage({
-          path: `/state/${node.state.toLowerCase().replace(/\s+/g, '-')}/${node.lga_name.toLowerCase().replace(/\s+/g, '-')}`,
+            path: `/state/${node.state.toLowerCase().replace(/\s+/g, '-')}/${node.lga_name.toLowerCase().replace(/\s+/g, '-')}`,
             component: lgaTemplate,
             context: {
                 state: node.state,

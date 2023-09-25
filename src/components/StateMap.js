@@ -9,21 +9,18 @@ function getStateGeoJSONPath(stateName) {
     return `/${stateName.replace(/\s+/g, '_').toLowerCase()}.geojson`;
 }
 
-
-const StateMap = ({ stateName }) => {
+const StateMap = ({ stateName, setCurrentHeading }) => {
     const svgRef = useRef(null);
-    const [currentHeading, setCurrentHeading] = React.useState("Select a LGA");
     const offsetY = 150; 
 
     useEffect(() => {
         const svg = d3.select(svgRef.current);
-
         const width = 800;
         const height = 800;
-        const projection = d3.geoMercator()
-        .translate([width / 2, (height / 2) - offsetY]);
 
+        const projection = d3.geoMercator().translate([width / 2, (height / 2) - offsetY]);
         const path = d3.geoPath().projection(projection);
+
         const colorScale = d3.scaleThreshold()
             .domain([1, 10, 20, 30])
             .range(["#878787", "#658565", "#4E844E", "#288228", "#008000"]);
@@ -71,11 +68,11 @@ const StateMap = ({ stateName }) => {
                         d3.select(this).attr("fill", colorScale(d.properties.currentValue));
                         setCurrentHeading(stateName);
                     })
-                    .on("click", function (event, d) {
-                        console.log(`You clicked on ${d.properties.lga_name}`);
-                        const lgaURL = `/state/${stateName.toLowerCase()}/${d.properties.lga_name.toLowerCase()}`;
+                    .on("click", function(event, d) {
+                        const lgaURL = `/state/${stateName.toLowerCase().replace(/\s+/g, '-')}/${d.properties.lga_name.toLowerCase().replace(/\s+/g, '-')}/`;
                         window.location.href = lgaURL;
-                    });
+                    })
+                    
             } catch (error) {
                 console.log(`Failed loading data for state ${stateName}.`, error);
             }
@@ -87,9 +84,8 @@ const StateMap = ({ stateName }) => {
     return (
         <div className="state-map">
             <div className='map_position'>
-            <svg ref={svgRef} width={800} height={800}></svg>
+                <svg ref={svgRef} width={800} height={800}></svg>
             </div>
-            <h2 className="custom-underline">{currentHeading}</h2>
         </div>
     );
 };

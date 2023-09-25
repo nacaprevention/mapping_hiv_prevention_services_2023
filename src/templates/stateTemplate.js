@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { graphql } from 'gatsby';
 import StateMap from '../components/StateMap';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -69,20 +69,22 @@ const locations = [
 
 
 export const query = graphql`
-  query($state: String!) {
-    allServiceProvidersCsv(filter: { state: { eq: $state } }) {
-      nodes {
-        state
-        lga_name
-      }
+query($state: String!) {
+  allServiceProvidersCsv(filter: { state: { eq: $state } }) {
+    nodes {
+      state
+      lga_name
     }
   }
+}
 `;
+
 
 
 
 const StateTemplate = ({ data }) => {
   const stateName = data.allServiceProvidersCsv.nodes[0]?.state;
+  const [currentHeading, setCurrentHeading] = useState(stateName || "N/A");
   console.log("State Name in StateTemplate:", stateName);
   const [selectedService, setSelectedService] = React.useState(services[0]);
   const [selectedPopulation, setSelectedPopulation] = React.useState(populations[0]);
@@ -96,18 +98,18 @@ const StateTemplate = ({ data }) => {
         <img src={logo} alt="NACA Logo" className="logo" />
         <span className="welcome-text">Mapping HIV Prevention Services, 2023</span>
         <span className="separator"> - </span>
-        <span className="current-heading">{stateName}</span>
+        <span className="current-heading">{currentHeading}</span>
       </div>
 
       <Container>
         <Row className='row'>
           <Col sm={8}>
-          <StateMap stateName={stateName} />
+          <StateMap stateName={stateName} setCurrentHeading={setCurrentHeading} currentHeading={currentHeading} />
           </Col>
           <Col sm={4}>
             <h2>Filter by:</h2>
-            <h3>LGA</h3>
-            <DropdownButton id="dropdown-basic-button_filter_lga" title={selectedLGA}>
+            <h3>Local Government Area (LGA)</h3>
+            <DropdownButton id="dropdown-basic-button_filter_lga" title={selectedLGA} className="scrollable-dropdown">
   <Dropdown.Item key="All LGAs" onClick={() => setSelectedLGA("All LGAs")}>
     All LGAs
   </Dropdown.Item>
@@ -116,7 +118,8 @@ const StateTemplate = ({ data }) => {
       key={node.lga_name} 
       onClick={() => {
         setSelectedLGA(node.lga_name);
-        navigate(`/state/${stateName.toLowerCase()}/${node.lga_name.toLowerCase().replace(/\s+/g, '-')}/`); // LGA page navigation
+        navigate(`/state/${stateName.toLowerCase().replace(/\s+/g, '-')}/${node.lga_name.toLowerCase().replace(/\s+/g, '-')}/`); // LGA page navigation
+        
       }}>
       {node.lga_name}
     </Dropdown.Item>

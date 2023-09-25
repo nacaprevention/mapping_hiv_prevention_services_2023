@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 
 const LgaMap = ({ lgaName, stateName }) => {
     const svgRef = useRef(null);
-    const [currentHeading, setCurrentHeading] = React.useState("Select a LGA");
     const [lgaData, setLgaData] = React.useState(null);
+    const offsetY = 150; 
 
     const stateToCodeMapping = {
         "Abia": "AB",
@@ -78,27 +78,18 @@ console.log("stateName:", stateName);
         if (lgaData && stateCode) {
             const svg = d3.select(svgRef.current);
             const centroid = d3.geoCentroid(lgaData);
-            const projection = d3.geoMercator().scale(18500).center(centroid).translate([800 / 2, 800 / 2]);
+            const projection = d3.geoMercator().scale(18500).center(centroid).translate([800 / 2, (800 / 2) - offsetY]);
             const path = d3.geoPath().projection(projection);
 
             svg.selectAll("*").remove();
             svg.append("g").selectAll("path").data(lgaData.features).enter().append("path")
                 .attr("d", path).attr("fill", "#4E844E")
-                .on("mouseover", function(event, d) {
-                    d3.select(this).attr("fill", "#B11B10");
-                    setCurrentHeading(d.properties.lga_name);
-                })
-                .on("mouseout", function(event, d) {
-                    d3.select(this).attr("fill", "#4E844E");
-                    setCurrentHeading("Select a LGA");
-                });
         }
     }, [lgaData, stateCode]);
 
     return (
         <div className="lga-map">
             <svg ref={svgRef} width={800} height={800}></svg>
-            <h2 className="custom-underline">{currentHeading}</h2>
         </div>
     );
 };

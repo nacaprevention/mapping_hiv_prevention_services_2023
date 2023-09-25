@@ -6,10 +6,11 @@ import logo from '../images/NACA.png';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { navigate } from 'gatsby';
 
 
 const states = [
-  "NATIONAL","Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", 
+  "All States","Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", 
   "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", 
   "Federal Capital Territory", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", 
   "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", 
@@ -89,15 +90,33 @@ const NationalMap = () => {
           .domain([1, 10, 20, 30])
           .range(["#878787", "#658565", "#4E844E", "#288228", "#008000"]);
 
+          const serviceToColumnMap = {
+            "All Services": "serviceProviders",
+            "Condom Distribtion": "CondomDistribution",
+            "Family Life and HIV/AIDS Education (FLHE)/Sexuality Education": "FamilyLifeAndHivAidsEducationFlheSexualityEducation",
+            "Gender and Human Rights (GHR)": "GenderAndHumanRightsGhr",
+            "Harm Reduction: Medication-Assisted Treatment (MAT)": "HarmReductionMedicationAssistedTreatmentMat",
+            "Harm Reduction: Needle and Syringe Exchange": "HarmReductionNeedleAndSyringeExchange",
+            "HIV Self-Testing (HIVST)": "HivSelfTestingHivst",
+            "HIV Testing Services (HTS)": "HivTestingServicesHts",
+            "Mental Health Services": "MentalHealthServices",
+            "Pre-Exposure Prophylaxis (PrEP)": "PreExposureProphylaxisPrep",
+            "Social and Behaviour Change Communication (SBCC)": "SocialAndBehaviourChangeCommunicationSbcc",
+            "STI Screening and Treatment": "StiScreeningAndTreatment",
+            "Technical Assistance (TA)": "TechnicalAssistanceTa"
+          };
+          
+          // Then, in your updateVisualization function:
           function updateVisualization() {
-            // Determine the filter to use
             let currentFilter = 'serviceProviders';
-            if (selectedService !== services[0] || selectedPopulation !== populations[0] || selectedLocation !== locations[0]) {
-                currentFilter = selectedService;  // or other logic if you have more detailed filtering based on population and location
-            }
+          
+            if (selectedService !== services[0]) {
+              currentFilter = serviceToColumnMap[selectedService] || selectedService;
+            } 
+          
         Promise.all([
             d3.json("/nigeria_geojson.geojson"),
-            d3.csv("/service_providers.csv")
+            d3.csv("/stateData.csv")
         ]).then(([geoData, serviceData]) => {
           geoData.features.forEach(geoFeature => {
             const serviceFeature = serviceData.find(s => s.state === geoFeature.properties.state);
@@ -133,7 +152,7 @@ const NationalMap = () => {
 
             })
             .on("click", function(event, d) {
-                const stateURL = `/state/${d.properties.state.toLowerCase()}`;
+                const stateURL = `/state/${d.properties.state.toLowerCase().replace(/\s+/g, '-')}`;
                 window.location.href = stateURL;
             });
             
@@ -172,7 +191,14 @@ const NationalMap = () => {
           {/* Bootstrap Dropdown Example */}
           <DropdownButton id="dropdown-basic-button_filter_state" title={selectedState} className="scrollable-dropdown">
               {states.map(state => (
-                  <Dropdown.Item key={state} href={`/state/${state.toLowerCase().replace(/\s+/g, '-')}`}>{state}</Dropdown.Item>
+                  <Dropdown.Item 
+                  key={state} 
+                  onClick={() => {
+                    setSelectedState(state);
+                    navigate(`/state/${state.toLowerCase().replace(/\s+/g, '-')}`); // LGA page navigation
+                  }}>
+                    {state}
+                  </Dropdown.Item>
               ))}
           </DropdownButton>
 
