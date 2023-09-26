@@ -1,3 +1,7 @@
+.scrollable-dropdown.non-default-service .btn, .scrollable-dropdown.non-default-population .btn, .scrollable-dropdown.non-default-location .btn {
+    border-color: #B11B10 !important;
+}
+
 .row{
     margin-left: 5vh;
 }

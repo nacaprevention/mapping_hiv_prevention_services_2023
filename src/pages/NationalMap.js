@@ -87,8 +87,10 @@ const NationalMap = () => {
         const path = d3.geoPath().projection(projection);
 
         const colorScale = d3.scaleThreshold()
-          .domain([1, 10, 20, 30])
-          .range(["#878787", "#658565", "#4E844E", "#288228", "#008000"]);
+        .domain([1, 6, 11, 21, 31]) 
+        .range(["#76ff0d", "#a0d492", "#78b971", "#60a455", "#3e8d00", "#008000"]);
+      
+    // Add #D3D3D3 (light grey) for the value 0    
 
           const serviceToColumnMap = {
             "All Services": "serviceProviders",
@@ -106,13 +108,51 @@ const NationalMap = () => {
             "Technical Assistance (TA)": "TechnicalAssistanceTa"
           };
           
+          const populationToColumnMap = {
+            "All Populations": "allPopulations",
+            "AGYW in school": "agywInSchool",
+            "AGYW out of school": "agywOutOfSchool",
+            "ABYM in school": "abymInSchool",
+            "ABYM out of school": "abymOutOfSchool",
+            "Children living with HIV": "childrenLivingWithHIV",
+            "General population": "generalPopulation",
+            "HIV-exposed infants": "hivExposedInfants",
+            "IDP": "idp",
+            "KP_FSW": "kpFsw",
+            "KP_MSM": "kpMsm",
+            "KP_people in enclosed settings": "kpPeopleInEnclosedSettings",
+            "KP_PWID": "kpPwid",
+            "KP_transgender": "kpTransgender",
+            "OVC": "ovc",
+            "Parents": "parents",
+            "People living with disabilities": "peopleLivingWithDisabilities",
+            "PLHIV": "plhiv",
+            "Serodiscordant couples": "serodiscordantCouples",
+            "Teachers": "teachers",
+            "Faith Leaders": "faithLeaders",
+            "Fishermen": "fishermen",
+            "Pastoralists": "pastoralists",
+            "Transport Workers": "transportWorkers"
+           }
+
+           const locationToColumnMap = {
+            "All Locations": "allLocations",
+            "Community": "community",
+            "Facility": "facility"
+           }
+
+           
           // Then, in your updateVisualization function:
           function updateVisualization() {
             let currentFilter = 'serviceProviders';
           
             if (selectedService !== services[0]) {
               currentFilter = serviceToColumnMap[selectedService] || selectedService;
-            } 
+            } else if (selectedPopulation !== populations[0]) {
+              currentFilter = populationToColumnMap[selectedPopulation] || selectedPopulation; // Assuming you create a similar mapping for populations
+            } else if (selectedLocation !== locations[0]) {
+              currentFilter = locationToColumnMap[selectedLocation] || selectedLocation; // Assuming you create a similar mapping for locations
+            }
           
         Promise.all([
             d3.json("/nigeria_geojson.geojson"),
@@ -134,30 +174,86 @@ const NationalMap = () => {
             .attr("d", path)
             .attr("fill", d => {
               const value = d.properties.currentValue;
-              if (value === undefined) {
-                console.error(`Missing value for state: ${d.properties.state} and filter: ${currentFilter}`);
-                return "#878787";  
+              if (value === 0) {
+                  return "#D3D3D3"; // return grey if the value is 0
               }
               return colorScale(value);
-            })
+          })          
+          
             .attr("stroke", "#FFFFFF")
             .on("mouseover", function(event, d) {
               d3.select(this).attr("fill", "#B11B10");
               setCurrentHeading(d.properties.state);
             })
             .on("mouseout", function(event, d) {
-              d3.select(this).attr("fill", colorScale(d.properties.currentValue));
+              const value = d.properties.currentValue;
+              if (value === 0) {
+                  d3.select(this).attr("fill", "#D3D3D3"); // return grey if the value is 0
+              } else {
+                  d3.select(this).attr("fill", colorScale(value));
+              }
               setCurrentHeading("NIGERIA");
-
-
-            })
+          })
+          
             .on("click", function(event, d) {
                 const stateURL = `/state/${d.properties.state.toLowerCase().replace(/\s+/g, '-')}`;
                 window.location.href = stateURL;
             });
             
-          
-        }).catch(error => {
+      const legendWidth = 40;
+      const legendHeight = 20;
+
+      // Calculate translation for legend to be positioned bottom-right
+      const translateX = 700;  // 800 - 100 (legend total width with some padding)
+      const translateY = 600;  // 800 - 200 (considering 5 blocks of color and some padding)
+
+      // Create a group for the legend
+      const legend = svg.append("g")
+        .attr("transform", `translate(${translateX},${translateY})`);
+
+        let legendData = colorScale.domain().map(lowerBound => {
+          return [lowerBound, colorScale.invertExtent(colorScale(lowerBound))[1]];
+      });
+      
+      // Filter out duplicates, based on the first element of each tuple
+      legendData = legendData.filter((value, index, self) => 
+          self.findIndex(v => v[0] === value[0]) === index);
+      
+      // Add the "No data" category at the start
+      if (!legendData.some(arr => arr[0] === 0)) {
+          legendData.unshift([0, 0]);
+      }
+      
+
+      const legendGroups = legend.selectAll("g")
+        .data(legendData)
+        .enter().append("g")
+        .attr("transform", (d, i) => `translate(0, ${i * legendHeight})`);
+
+        legendGroups.append("rect")
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .attr("fill", d => {
+          if (d[0] === 0) return "#D3D3D3";  // Explicitly return grey if the range is [0,0]
+          return colorScale(d[0]);
+        });    
+
+        legendGroups.append("text")
+        .attr("x", legendWidth + 5)
+        .attr("y", legendHeight / 2)
+        .attr("dy", "0.35em")
+        .attr("font-size", "12px")
+        .attr("font-family", "'Lato', sans-serif") 
+        .text(d => {
+          if (d[0] === 0) return `0`; 
+          if (d[0] > 30) return 'Above 30';
+          return `${d[0]} - ${d[1] - 1}`;
+      });
+      
+        })
+        
+        
+        .catch(error => {
           console.log("Error loading file:", error);
         });
     }
@@ -203,34 +299,57 @@ const NationalMap = () => {
           </DropdownButton>
 
 <h3>Service</h3>
-                {/* Service Dropdown */}
-                <DropdownButton id="dropdown-basic-button_filter_service" title={selectedService} className="scrollable-dropdown">
+<DropdownButton id="dropdown-basic-button_filter_service" title={selectedService} 
+className={`scrollable-dropdown ${selectedService !== services[0] ? 'non-default-service' : ''}`}>
   {services.map(service => (
-    <Dropdown.Item key={service} onClick={() => setSelectedService(service)}>
+    <Dropdown.Item 
+      key={service} 
+      onClick={() => {
+        setSelectedService(service); 
+        setSelectedPopulation(populations[0]); // Resetting Population dropdown
+        setSelectedLocation(locations[0]);     // Resetting Location dropdown
+      }}>
       {service}
     </Dropdown.Item>
   ))}
 </DropdownButton>
 
+
 <h3> Target Population</h3>
-{/* Target Population Dropdown */}
-<DropdownButton id="dropdown-basic-button_filter_population" title={selectedPopulation} className="scrollable-dropdown">
+<DropdownButton id="dropdown-basic-button_filter_population" title={selectedPopulation} 
+    className={`scrollable-dropdown ${selectedPopulation !== populations[0] ? 'non-default-population' : ''}`}
+    >
   {populations.map(population => (
-    <Dropdown.Item key={population} onClick={() => setSelectedPopulation(population)}>
+    <Dropdown.Item 
+      key={population} 
+      onClick={() => {
+        setSelectedPopulation(population);
+        setSelectedService(services[0]);   // Resetting Service dropdown
+        setSelectedLocation(locations[0]); // Resetting Location dropdown
+      }}>
       {population}
     </Dropdown.Item>
   ))}
 </DropdownButton>
 
+
 <h3> Location</h3>
-{/* Location Dropdown */}
-<DropdownButton id="dropdown-basic-button_filter_location" title={selectedLocation} className="scrollable-dropdown">
+<DropdownButton id="dropdown-basic-button_filter_location" title={selectedLocation}    
+    className={`scrollable-dropdown ${selectedLocation !== locations[0] ? 'non-default-location' : ''}`}
+    >
   {locations.map(location => (
-    <Dropdown.Item key={location} onClick={() => setSelectedLocation(location)}>
+    <Dropdown.Item 
+      key={location} 
+      onClick={() => {
+        setSelectedLocation(location);
+        setSelectedService(services[0]);       // Resetting Service dropdown
+        setSelectedPopulation(populations[0]); // Resetting Population dropdown
+      }}>
       {location}
     </Dropdown.Item>
   ))}
 </DropdownButton>
+
 
         </Col>
       </Row>
