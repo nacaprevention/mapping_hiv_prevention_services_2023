@@ -22,10 +22,11 @@ const StateMap = ({ stateName, setCurrentHeading }) => {
         const path = d3.geoPath().projection(projection);
 
         const colorScale = d3.scaleThreshold()
-            .domain([1, 10, 20, 30])
-            .range(["#878787", "#658565", "#4E844E", "#288228", "#008000"]);
+        .domain([1, 6, 11, 21, 31]) 
+        .range(["#76ff0d", "#a0d492", "#78b971", "#60a455", "#3e8d00", "#008000"]);
 
         const stateGeoJSONPath = getStateGeoJSONPath(stateName);
+
 
         const fetchData = async () => {
             try {

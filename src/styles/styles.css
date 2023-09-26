@@ -2,6 +2,16 @@
     border-color: #B11B10 !important;
 }
 
+#dropdown-basic-button_filter_location{
+    margin-bottom: 6vh;
+}
+
+.link{
+    margin-top: 3vh !important;
+    font-family: 'Lato', sans-serif;
+    color: #008000 !important ;
+    font-size: 1rem;
+}
 .row{
     margin-left: 5vh;
 }
@@ -33,7 +43,6 @@
 }
 
 .welcome-text {
-    color: blue; /* Or any other styles you want */
     font-weight: bold;
     margin-left: 2vh;
     font-family: 'Lato', sans-serif;
@@ -97,5 +106,22 @@ h2{
 }
 
 .map_position{
-    padding-top: -50px;
+    padding-top: -20px;
+}
+
+
+.updateTitle{
+    font-weight: bold;
+    margin-left: 2vh;
+    font-family: 'Lato', sans-serif;
+    color: #008000;
+    font-size: 1.7rem;
+    font-weight: 900;
+}
+
+.parent-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;  /* or whatever height you want */
 }

@@ -7,6 +7,8 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { navigate } from 'gatsby';
+import { Link } from "gatsby";
+
 
 
 const states = [
@@ -204,8 +206,8 @@ const NationalMap = () => {
       const legendHeight = 20;
 
       // Calculate translation for legend to be positioned bottom-right
-      const translateX = 700;  // 800 - 100 (legend total width with some padding)
-      const translateY = 600;  // 800 - 200 (considering 5 blocks of color and some padding)
+      const translateX = 650;  // 800 - 100 (legend total width with some padding)
+      const translateY = 500;  // 800 - 200 (considering 5 blocks of color and some padding)
 
       // Create a group for the legend
       const legend = svg.append("g")
@@ -272,6 +274,10 @@ const NationalMap = () => {
             <span className="current-heading"> {currentHeading}</span>
         </div>
         
+
+        
+
+
    <Container>
       <Row className='row'>
         <Col sm={8}>
@@ -350,7 +356,7 @@ className={`scrollable-dropdown ${selectedService !== services[0] ? 'non-default
   ))}
 </DropdownButton>
 
-
+      <Link className="link" to="/SubmissionStatus"> View submission status</Link>
         </Col>
       </Row>
     </Container>
@@ -358,6 +364,5 @@ className={`scrollable-dropdown ${selectedService !== services[0] ? 'non-default
   </div>
   );
   
-
             }
 export default NationalMap; 
