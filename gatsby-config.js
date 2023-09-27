@@ -2,6 +2,7 @@
  * @type {import('gatsby').GatsbyConfig}
  */
 module.exports = {
+  pathPrefix: "/mapping_hiv_prevention_services_2023",
   siteMetadata: {
     title: `Mapping HIV Prevention Services, Nigeria, 2023`,
     siteUrl: `https://www.yourdomain.tld`,

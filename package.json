@@ -8,6 +8,7 @@
     "gatsby"
   ],
   "scripts": {
+    "deploy": "gatsby build --prefix-paths && gh-pages -d public",
     "develop": "gatsby develop",
     "start": "gatsby develop",
     "build": "gatsby build",
@@ -28,6 +29,7 @@
     "react-select": "^5.7.5"
   },
   "devDependencies": {
-    "csv-loader": "^3.0.5"
+    "csv-loader": "^3.0.5",
+    "gh-pages": "^6.0.0"
   }
 }
